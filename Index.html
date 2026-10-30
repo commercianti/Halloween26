@@ -1,31 +1,183 @@
-```html
-<!-- ... existing code ... -->
-<body class="h-full flex flex-col justify-between items-center relative py-10 px-4">
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Labirinto Maledetto - Garzera</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    <!-- Floating Ghosts Background -->
-    <div class="ghost ghost-1"><i class="fa-solid fa-ghost"></i></div>
-    <div class="ghost ghost-2"><i class="fa-solid fa-ghost"></i></div>
-    <div class="ghost ghost-3"><i class="fa-solid fa-ghost"></i></div>
-    <div class="ghost ghost-4"><i class="fa-solid fa-ghost"></i></div>
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+      padding: 20px 10px;
+    }
 
-    <!-- Header Section -->
-    <header class="text-center z-10 my-auto">
-        <h2 class="text-xs sm:text-sm md:text-base font-semibold tracking-widest uppercase text-orange-400 opacity-90 mb-2 drop-shadow">
-            Associazione Commercianti Artigiani Gazzera
-        </h2>
-        <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-wide text-orange-500 drop-shadow-[0_0_15px_rgba(255,102,0,0.6)]">
-            Il labirinto maledetto - 2° edizione
-        </h1>
-    </header>
+    /* Fantasmi di sottofondo */
+    .ghost {
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.15;
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite alternate;
+    }
 
-    <!-- Hidden Native Audio Tag -->
-    <!-- Assicurati che il file audio su GitHub sia nominato 'audio.mp3' nella stessa cartella -->
-    <audio id="audioPlayer" preload="metadata">
-        <source src="audio.mp3" type="audio/mpeg">
-        <source src="audio.ogg" type="audio/ogg">
-    </audio>
+    .ghost-1 { top: 15%; left: 10%; animation-delay: 0s; }
+    .ghost-2 { top: 60%; right: 12%; animation-delay: 2s; }
+    .ghost-3 { bottom: 15%; left: 15%; animation-delay: 4s; }
 
-    <!-- Center Interactive Area -->
-    <div class="relative flex flex-col items-center justify-center z-10 w-full max-w-xs my-auto">
-<!-- ... existing code ... -->
-```
+    @keyframes float {
+      0% { transform: translateY(0) rotate(-5deg); }
+      100% { transform: translateY(-30px) rotate(5deg); }
+    }
+
+    /* Intestazione */
+    header {
+      text-align: center;
+      z-index: 10;
+      margin-top: 10px;
+    }
+
+    .org-title {
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #8a99ad;
+      margin-bottom: 8px;
+    }
+
+    .event-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ff5500;
+      text-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Player Audio */
+    .player-container {
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .play-btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ff5500, #b33600);
+      border: none;
+      color: white;
+      font-size: 2.5rem;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255, 85, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 15px rgba(255, 85, 0, 0.4);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #222;
+      border-radius: 3px;
+      margin-top: 30px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #ff5500;
+      transition: width 0.1s linear;
+    }
+
+    footer {
+      font-size: 0.75rem;
+      color: #444;
+      z-index: 10;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ghost ghost-1">👻</div>
+  <div class="ghost ghost-2">👻</div>
+  <div class="ghost ghost-3">👻</div>
+
+  <header>
+    <div class="org-title">Associazione Commercianti Artigiani Gazzera</div>
+    <div class="event-title">Il labirinto maledetto - 2° edizione</div>
+  </header>
+
+  <div class="player-container">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">&#9654;</button>
+    <div class="progress-bar-container" onclick="seek(event)">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <audio id="myAudio" src="audio.mp3"></audio>
+  </div>
+
+  <footer>Halloween 2026</footer>
+
+  <script>
+    const audio = document.getElementById('myAudio');
+    const playBtn = document.getElementById('playBtn');
+    const progressBar = document.getElementById('progressBar');
+
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerHTML = '&#10074;&#10074;'; // Icona Pausa
+      } else {
+        audio.pause();
+        playBtn.innerHTML = '&#9654;'; // Icona Play
+      }
+    }
+
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) {
+        const percentage = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = percentage + '%';
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      playBtn.innerHTML = '&#9654;';
+      progressBar.style.width = '0%';
+    });
+
+    function seek(event) {
+      const container = event.currentTarget;
+      const clickX = event.clientX - container.getBoundingClientRect().left;
+      const width = container.clientWidth;
+      audio.currentTime = (clickX / width) * audio.duration;
+    }
+  </script>
+</body>
+</html>
